@@ -255,8 +255,8 @@ fetch("https://raw.githubusercontent.com/poonpoonkbg-oss/Slope-stability-of-Pipe
   .catch(err => console.error("❌ JSON Error", err));
   function computeFS(){
   if(!FS_DATA) {
-    el("fsBox").textContent = "Loading...";
-    el("dispBox").textContent = "Loading...";
+    el("fsBox").textContent = "0.00";
+    el("dispBox").textContent = "0.00 mm";
     return;
   }
 
