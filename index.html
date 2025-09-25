@@ -240,7 +240,7 @@
   let FS_DATA = null; // ตัวแปรเก็บข้อมูล JSON
 
 // โหลด JSON ครั้งเดียวตอนเริ่มต้น
-fetch("PTT_FS.json")
+fetch("https://raw.githubusercontent.com/poonpoonkbg-oss/Slope-stability-of-Pipeline-FS-/refs/heads/main/PTT%20EXCEL/PTT_FS.json")
   .then(res => res.json())
   .then(data => {
     FS_DATA = data;
