@@ -286,10 +286,10 @@ fetch("https://raw.githubusercontent.com/poonpoonkbg-oss/Slope-stability-of-Pipe
     }
 
     // ✅ Displacement
-    if(match["Displacement (mm)"]){
-      el('dispBox').textContent = match["Displacement (mm)"] + " mm";
+    if(match["displacement (mm)"]){
+      el('dispBox').textContent = match["displacement (mm)"] + " mm";
     } else {
-      el('dispBox').textContent = "N/A";
+      el('dispBox').textContent = "Collapse";
     }
   }
 }
