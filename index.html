@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Slope Stability – KU Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --ku-green:#1f5c2b;
+      --ku-light:#e8f4ec;
+      --panel-radius:14px;
+      --max:1200px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:"Noto Sans Thai",system-ui,sans-serif;background:#f7faf8;color:#0a0a0a}
+    header{background:var(--ku-green);color:#fff;position:sticky;top:0;z-index:10;box-shadow:0 2px 10px rgba(0,0,0,.12)}
+    .bar{max-width:var(--max);margin:auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.75rem 1rem}
+    .brand{display:flex;align-items:center;gap:.75rem}
+    .brand img{height:38px;border-radius:6px;background:#fff}
+    .brand h1{font-size:1.15rem;margin:0;font-weight:700}
+    main{max-width:var(--max);margin:auto;padding:1rem}
+    .grid{display:grid;gap:1rem;grid-template-columns: repeat(12, 1fr);}
+    .card{background:#fff;border:1px solid #e7eee9;border-radius:var(--panel-radius);box-shadow:0 4px 16px rgba(0,0,0,.04);overflow:hidden;}
+    .card header{background:var(--ku-green);color:#fff}
+    .card .head{padding:.6rem .9rem}
+    .head h2{margin:0;font-size:1rem;font-weight:700}
+    .body{padding:1rem}
+
+    /* Layout */
+    .panel-input{grid-column: span 6;}
+    .panel-result{grid-column: span 6;}
+    .panel-param{grid-column: span 12;}
+    .panel-plot-full{grid-column: span 12;}
+    @media(max-width:900px){
+      .panel-input,.panel-result,.panel-param,.panel-plot-full{grid-column:1/-1}
+    }
+
+    /* Form */
+    .form-row{display:grid;grid-template-columns:120px 1fr 80px;gap:.6rem;align-items:center;margin-bottom:.6rem}
+    .form-row label{font-weight:600}
+    .form-row input, .form-row select{width:100%;padding:.5rem;border:1px solid #cfe1d6;border-radius:10px;background:#f4fbf6;outline:none}
+    .fs-wrap{display:flex;align-items:center;gap:1rem}
+    .fs-title{font-size:2rem;font-weight:700}
+    .fs-box{flex:1;background:#dff1ff;border:2px solid #9ad0ff;padding:1rem;border-radius:12px;text-align:center;font-size:2.4rem;font-weight:800;color:#0b3a5e}
+
+    /* Parameters */
+    .param-grid{display:grid;grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));;gap:.6rem;}
+    .param-item{
+      background:#f4fbf6;padding:.5rem .7rem;border:1px solid #cfe1d6;border-radius:8px;
+      display:flex;justify-content:space-between;align-items:center;min-height:45px;max-width:250px;
+    }
+    .param-item label{font-weight:600;font-size:.85rem;white-space:nowrap;}
+    .param-item input{border:none;background:transparent;text-align:right;font-size:.9rem;font-weight:500;width:100px;}
+
+    /* Plot */
+    .plot-box{background:#fff;border:2px dashed #cfe1d6;border-radius:12px;height:380px;display:flex;align-items:center;justify-content:center;flex-direction:column}
+    .plot-box img{max-height:300px;max-width:100%;object-fit:contain}
+    .plot-note{margin-top:8px;font-size:.9rem;color:#333;}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="brand">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_-4TQ56OhkUNWSp8yIgllgBYEz301w86buQ&s">
+        <h1>โปรโตไทป์คำนวณเสถียรภาพลาด (Demo)</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="grid">
+      <!-- Input -->
+      <section class="card panel-input">
+        <header><div class="head"><h2>ป้อนข้อมูล</h2></div></header>
+        <div class="body">
+          <div class="form-row">
+            <label>ZONE</label>
+            <select id="zone">
+              <option value="">กดเลือก</option>
+              <option value="ABC">Zone ABC</option>
+              <option value="D">Zone D</option>
+              <option value="EF">Zone EF</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>ความลึก</label>
+            <select id="depth">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+            <span>เมตร</span>
+          </div>
+          <div class="form-row">
+            <label>องศาของ Slope</label>
+            <select id="theta">
+              <option value="20">20</option>
+              <option value="30">30</option>
+              <option value="40">40</option>
+              <option value="50">50</option>
+              <option value="60">60</option>
+              <option value="70">70</option>
+              <option value="80">80</option>
+            </select>
+            <span>องศา</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Result -->
+      <section class="card panel-result">
+        <header><div class="head"><h2>ผลลัพธ์ความเสถียรภาพ (RESULT)</h2></div></header>
+        <div class="body">
+          <div class="fs-wrap">
+            <div class="fs-title">F.S. =</div>
+            <div id="fsBox" class="fs-box">0.000</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Parameter Soft Clay -->
+      <section class="card panel-param">
+        <header><div class="head"><h2>Parameter Soft Clay</h2></div></header>
+        <div class="body param-grid">
+          <div class="param-item"><label>ZONE</label><input id="p1_zone" readonly></div>
+          <div class="param-item"><label>γ</label><input id="p1_gamma" readonly></div>
+          <div class="param-item"><label>Su</label><input id="p1_su" readonly></div>
+          <div class="param-item"><label>C</label><input id="p1_c" readonly></div>
+          <div class="param-item"><label>φ (°)</label><input id="p1_phi" readonly></div>
+          <div class="param-item"><label>ν</label><input id="p1_nu" readonly></div>
+          <div class="param-item"><label>E</label><input id="p1_e" readonly></div>
+          <div class="param-item"><label>Void ratio</label><input id="p1_void" readonly></div>
+          <div class="param-item"><label>Ko</label><input id="p1_ko" readonly></div>
+          <div class="param-item"><label>Kx</label><input id="p1_kx" readonly></div>
+          <div class="param-item"><label>Ky</label><input id="p1_ky" readonly></div>
+        </div>
+      </section>
+
+      <!-- Parameter Stiff Clay -->
+      <section class="card panel-param">
+        <header><div class="head"><h2>Parameter Stiff Clay</h2></div></header>
+        <div class="body param-grid">
+          <div class="param-item"><label>ZONE</label><input id="p2_zone" readonly></div>
+          <div class="param-item"><label>γ</label><input id="p2_gamma" readonly></div>
+          <div class="param-item"><label>Su</label><input id="p2_su" readonly></div>
+          <div class="param-item"><label>C</label><input id="p2_c" readonly></div>
+          <div class="param-item"><label>φ (°)</label><input id="p2_phi" readonly></div>
+          <div class="param-item"><label>ν</label><input id="p2_nu" readonly></div>
+          <div class="param-item"><label>E</label><input id="p2_e" readonly></div>
+          <div class="param-item"><label>Void ratio</label><input id="p2_void" readonly></div>
+          <div class="param-item"><label>Ko</label><input id="p2_ko" readonly></div>
+          <div class="param-item"><label>Kx</label><input id="p2_kx" readonly></div>
+          <div class="param-item"><label>Ky</label><input id="p2_ky" readonly></div>
+        </div>
+      </section>
+
+      <!-- Parameter Sand -->
+      <section class="card panel-param">
+        <header><div class="head"><h2>Parameter Sand</h2></div></header>
+        <div class="body param-grid">
+          <div class="param-item"><label>ZONE</label><input id="p3_zone" readonly></div>
+          <div class="param-item"><label>γ</label><input id="p3_gamma" readonly></div>
+          <div class="param-item"><label>Su</label><input id="p3_su" readonly></div>
+          <div class="param-item"><label>C</label><input id="p3_c" readonly></div>
+          <div class="param-item"><label>φ (°)</label><input id="p3_phi" readonly></div>
+          <div class="param-item"><label>ν</label><input id="p3_nu" readonly></div>
+          <div class="param-item"><label>E</label><input id="p3_e" readonly></div>
+          <div class="param-item"><label>Void ratio</label><input id="p3_void" readonly></div>
+          <div class="param-item"><label>Ko</label><input id="p3_ko" readonly></div>
+          <div class="param-item"><label>Kx</label><input id="p3_kx" readonly></div>
+          <div class="param-item"><label>Ky</label><input id="p3_ky" readonly></div>
+        </div>
+      </section>
+
+      <!-- Plot -->
+      <section class="card panel-plot-full">
+        <header><div class="head"><h2>Slope และ วง Failure</h2></div></header>
+        <div class="body">
+          <div class="plot-box">
+            <div id="imgContainer" style="display:flex;flex-wrap:wrap;gap:1rem;justify-content:center;"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+  const ZONE_MAP = { "ABC":"G1", "D":"G2", "EF":"G3" };
+
+  const SOIL_TABLE = {
+    "ABC": {
+      soft:  { gamma:20,   su:25,  E:10000, c:0, phi:21, nu:0.2, void:1.4,   Ko:1,   Kx:8.64e-7, Ky:8.64e-7 },
+      stiff: { gamma:18.9, su:30,  E:30000, c:0, phi:22, nu:0.2, void:1.3,   Ko:0.7, Kx:8.64e-6, Ky:8.64e-6 },
+      sand:  { gamma:20,   su:0,   E:80000, c:16.4, phi:32.82, nu:0.2, void:0.7, Ko:0.5, Kx:8.64e-2, Ky:8.64e-2 }
+    },
+    "D": {
+      soft:  { gamma:16.2, su:16,  E:8000,  c:0, phi:21, nu:0.2, void:1.776, Ko:1,   Kx:8.64e-7, Ky:8.64e-7 },
+      stiff: { gamma:16.8, su:30,  E:25000, c:0, phi:22, nu:0.2, void:1.345, Ko:0.7, Kx:8.64e-6, Ky:8.64e-6 },
+      sand:  { gamma:20,   su:0,   E:80000, c:16.4, phi:32.14, nu:0.2, void:0.7, Ko:0.5, Kx:8.64e-2, Ky:8.64e-2 }
+    },
+    "EF": {
+      soft:  { gamma:15,   su:11,  E:6000,  c:0, phi:21, nu:0.2, void:2.525, Ko:1,   Kx:8.64e-7, Ky:8.64e-7 },
+      stiff: { gamma:16,   su:25,  E:20000, c:0, phi:22, nu:0.2, void:2.065, Ko:0.7, Kx:8.64e-6, Ky:8.64e-6 },
+      sand:  { gamma:20,   su:0,   E:80000, c:16.4, phi:32.14, nu:0.2, void:0.7, Ko:0.5, Kx:8.64e-2, Ky:8.64e-2 }
+    }
+  };
+
+  const el = id => document.getElementById(id);
+
+  function fillParams(prefix, data, zoneKey){
+    el(prefix+'_zone').value  = zoneKey;
+    el(prefix+'_gamma').value = data.gamma + " kN/m³";
+    el(prefix+'_su').value    = (data.su===0?"-":data.su+" kPa");
+    el(prefix+'_c').value     = data.c + " kPa";
+    el(prefix+'_phi').value   = data.phi + "°";
+    el(prefix+'_nu').value    = data.nu;
+    el(prefix+'_e').value     = data.E + " kN/m²";
+    el(prefix+'_void').value  = data.void;
+    el(prefix+'_ko').value    = data.Ko;
+    el(prefix+'_kx').value    = data.Kx + " m/day";
+    el(prefix+'_ky').value    = data.Ky + " m/day";
+  }
+
+  function loadZone(zoneKey){
+    const group = SOIL_TABLE[zoneKey];
+    if(!group) return;
+    fillParams('p1', group.soft, zoneKey);
+    fillParams('p2', group.stiff, zoneKey);
+    fillParams('p3', group.sand, zoneKey);
+  }
+  let FS_DATA = null; // ตัวแปรเก็บข้อมูล JSON
+
+// โหลด JSON ครั้งเดียวตอนเริ่มต้น
+fetch("PTT_FS.json")
+  .then(response => {
+    if (!response.ok) throw new Error("โหลด JSON ไม่ได้");
+    return response.json();
+  })
+  .then(data => {
+    FS_DATA = data;
+    console.log("โหลด JSON และเก็บสำเร็จ ✅", FS_DATA);
+  })
+  .catch(err => {
+    console.error("โหลด JSON ไม่สำเร็จ ❌", err);
+  });
+  function computeFS(){
+  const zoneKey = el("zone").value;
+  const depth   = parseInt(el("depth").value);
+  const theta   = el("theta").value;
+
+  if(!zoneKey || !depth || !theta){
+    el('fsBox').textContent = "0.000";
+    return;
+  }
+
+  const prefix = ZONE_MAP[zoneKey];
+  const match = FS_DATA.find(item =>
+    item.Zone === prefix &&
+    item["Depth (m)"] === depth &&
+    item["Degree (°)"] === `${theta}°`
+  );
+
+  if(match){
+    el('fsBox').textContent = match["F.S."];
+  }else{
+    el('fsBox').textContent = "N/A";
+  }
+}
+function showImage() {
+  const zoneKey = el("zone").value;
+  const depth = el("depth").value;
+  const theta = el("theta").value;
+  if (!zoneKey || !depth || !theta) return;
+
+
+  // โหลดพารามิเตอร์ และคำนวณ FS
+  loadZone(zoneKey);
+  computeFS();
+
+  const prefix = ZONE_MAP[zoneKey];
+  const fileName = `Ptt picture/${prefix} ${theta} (${depth}).png`;
+
+  const container = document.getElementById("imgContainer");
+  container.innerHTML = ""; // ล้างรูปเก่าออก
+
+  const wrapper = document.createElement("div");
+  wrapper.style.textAlign = "center";
+
+  const img = document.createElement("img");
+  img.src = fileName;
+  img.style.maxWidth = "100%";
+  img.style.maxHeight = "350px";
+  img.style.display = "block";
+  img.style.margin = "auto";
+
+  img.onerror = () => {
+    wrapper.innerHTML = `<div style="color:red; font-weight:bold; font-size:1.2rem;">
+      The Structure seem to be Collapse
+    </div>`;
+  };
+
+  const caption = document.createElement("div");
+  caption.textContent = fileName;
+  caption.className = "plot-note";
+
+  wrapper.appendChild(img);
+  wrapper.appendChild(caption);
+  container.appendChild(wrapper);
+}
+
+ ["zone","theta","depth"].forEach(id=>{
+  el(id).addEventListener("change", ()=>{
+    loadZone(el('zone').value);
+    computeFS();
+    showImage();
+  });
+});
+
+  computeFS();
+  </script>
+</body>
+</html>
