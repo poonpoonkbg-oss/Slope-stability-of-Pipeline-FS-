@@ -241,24 +241,24 @@
 
 // โหลด JSON ครั้งเดียวตอนเริ่มต้น
 fetch("PTT_FS.json")
-  .then(response => {
-    if (!response.ok) throw new Error("โหลด JSON ไม่ได้");
-    return response.json();
-  })
+  .then(res => res.json())
   .then(data => {
     FS_DATA = data;
-    console.log("โหลด JSON และเก็บสำเร็จ ✅", FS_DATA);
+    console.log("✅ JSON Loaded", FS_DATA);
   })
-  .catch(err => {
-    console.error("โหลด JSON ไม่สำเร็จ ❌", err);
-  });
+  .catch(err => console.error("❌ JSON Error", err));
   function computeFS(){
+  if(!FS_DATA) {
+    el("fsBox").textContent = "Loading...";
+    return;
+  }
+
   const zoneKey = el("zone").value;
   const depth   = parseInt(el("depth").value);
   const theta   = el("theta").value;
 
   if(!zoneKey || !depth || !theta){
-    el('fsBox').textContent = "0.000";
+    el("fsBox").textContent = "0.000";
     return;
   }
 
@@ -281,16 +281,13 @@ function showImage() {
   const theta = el("theta").value;
   if (!zoneKey || !depth || !theta) return;
 
-
-  // โหลดพารามิเตอร์ และคำนวณ FS
-  loadZone(zoneKey);
   computeFS();
 
   const prefix = ZONE_MAP[zoneKey];
   const fileName = `Ptt picture/${prefix} ${theta} (${depth}).png`;
 
   const container = document.getElementById("imgContainer");
-  container.innerHTML = ""; // ล้างรูปเก่าออก
+  container.innerHTML = "";
 
   const wrapper = document.createElement("div");
   wrapper.style.textAlign = "center";
