@@ -64,7 +64,7 @@
     <div class="bar">
       <div class="brand">
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS_-4TQ56OhkUNWSp8yIgllgBYEz301w86buQ&s">
-        <h1>โปรโตไทป์คำนวณเสถียรภาพลาด (Demo)</h1>
+        <h1>ความเสถียรภาพลาดทางลาดชัน พื้นที่ Zone A - F ใน กรุงเทพมหานคร</h1>
       </div>
     </div>
   </header>
@@ -116,16 +116,22 @@
         </div>
       </section>
 
-      <!-- Result -->
-      <section class="card panel-result">
-        <header><div class="head"><h2>ผลลัพธ์ความเสถียรภาพ (RESULT)</h2></div></header>
-        <div class="body">
-          <div class="fs-wrap">
-            <div class="fs-title">F.S. =</div>
-            <div id="fsBox" class="fs-box">0.000</div>
-          </div>
+  <section class="card panel-result">
+    <header><div class="head"><h2>ผลลัพธ์ความเสถียรภาพ (RESULT)</h2></div></header>
+    <div class="body">
+      <div class="fs-wrap">
+        <div class="fs-title">F.S. =</div>
+        <div id="fsBox" class="fs-box">0.000</div>
+      </div>
+      <!-- ✅ กล่องใหม่สำหรับ Displacement -->
+      <div class="fs-wrap" style="margin-top:1rem;">
+        <div class="fs-title">Disp. =</div>
+        <div id="dispBox" class="fs-box" style="background:#ffe9d6;border-color:#ffb98a;color:#5a2d00;">
+          0.000 mm
         </div>
-      </section>
+      </div>
+    </div>
+  </section>
 
       <!-- Parameter Soft Clay -->
       <section class="card panel-param">
@@ -250,6 +256,7 @@ fetch("https://raw.githubusercontent.com/poonpoonkbg-oss/Slope-stability-of-Pipe
   function computeFS(){
   if(!FS_DATA) {
     el("fsBox").textContent = "Loading...";
+    el("dispBox").textContent = "Loading...";
     return;
   }
 
@@ -259,6 +266,7 @@ fetch("https://raw.githubusercontent.com/poonpoonkbg-oss/Slope-stability-of-Pipe
 
   if(!zoneKey || !depth || !theta){
     el("fsBox").textContent = "0.000";
+    el("dispBox").textContent = "0.000 mm";
     return;
   }
 
@@ -269,16 +277,25 @@ fetch("https://raw.githubusercontent.com/poonpoonkbg-oss/Slope-stability-of-Pipe
     item["Degree (°)"] === `${theta}°`
   );
 
- if (match) {
-  if (match["F.S."] === "Fail") {
-    el('fsBox').textContent = "Collapse";
-  } else {
-    el('fsBox').textContent = match["F.S."];
+  if(match){
+    // ✅ F.S.
+    if(match["F.S."] === "Fail" || match["F.S."] === ""){
+      el('fsBox').textContent = "Collapse";
+    } else {
+      el('fsBox').textContent = match["F.S."];
+    }
+
+    // ✅ Displacement
+    if(match["Displacement (mm)"]){
+      el('dispBox').textContent = match["Displacement (mm)"] + " mm";
+    } else {
+      el('dispBox').textContent = "N/A";
+    }
+  }else{
+    el('fsBox').textContent = "N/A";
+    el('dispBox').textContent = "N/A";
   }
-} else {
-  el('fsBox').textContent = "N/A";
 }
-  }
 function showImage() {
   const zoneKey = el("zone").value;
   const depth = el("depth").value;
