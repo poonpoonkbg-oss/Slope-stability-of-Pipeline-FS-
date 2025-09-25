@@ -269,12 +269,16 @@ fetch("https://raw.githubusercontent.com/poonpoonkbg-oss/Slope-stability-of-Pipe
     item["Degree (°)"] === `${theta}°`
   );
 
-  if(match){
+ if (match) {
+  if (match["F.S."] === "Fail") {
+    el('fsBox').textContent = "Collapse";
+  } else {
     el('fsBox').textContent = match["F.S."];
-  }else{
-    el('fsBox').textContent = "N/A";
   }
+} else {
+  el('fsBox').textContent = "N/A";
 }
+  }
 function showImage() {
   const zoneKey = el("zone").value;
   const depth = el("depth").value;
